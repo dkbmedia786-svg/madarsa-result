@@ -1,378 +1,323 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Madarsa Result Card - Full Version Fixed</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Madarsa Result - Admin Panel</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; }
+        
+        body { background: linear-gradient(135deg, #1e5631, #a4be7b); min-height: 100vh; padding: 20px; }
 
-<style>
-    body { margin:0; padding:10px; font-family:"Segoe UI", Arial, sans-serif; background: linear-gradient(135deg, #1e5631, #a4be7b); font-weight:700; }
-    
-    #card { 
-        width:900px; 
-        margin:auto; 
-        background: #ffffff; 
-        border-radius:16px; 
-        padding:20px; 
-        border:5px solid #1e5631; 
-        position: relative; 
-        box-shadow:0 10px 20px rgba(0,0,0,0.3);
-        min-height: 1295px; 
-        display: flex;
-        flex-direction: column;
-    }
-    
-    #topSpace { position: relative; height:280px; margin-bottom:30px; background: linear-gradient(90deg, #fdfbf7, #fffdd0, #fdfbf7); margin: -20px -20px 30px -20px; padding: 15px; border-radius: 12px 12px 0 0; clip-path: ellipse(110% 100% at 50% 0%); border-bottom: 2px solid #a5d6a7; }
-    
-    input, .mark, #total, #percent, #rank { color: #000000 !important; font-style: normal !important; }
-    .reg-no { position: absolute; top: 10px; font-size: 14px; color: #2e7d32; font-weight: 800; z-index: 15; }
-    .urdu-label { font-family: "Urdu Typesetting", "Sakkal Majalla", serif; font-size: 22px; font-weight: 900; color: #1b5e20; }
-    
-    #headerDraggable { position: absolute; left: 50%; transform: translateX(-50%); width: 85%; text-align:center; z-index: 5; top: 10px; }
-    #urduLogoImg { max-width: 800px; height: 130px; object-fit: contain; cursor: pointer; border: 1px dashed transparent; }
-    
-    #photoBox { position: absolute; top: 60px; right: 15px; width:130px; height:150px; border:2px solid #2e7d32; background: #fff; display:flex; align-items:center; justify-content:center; z-index: 10; overflow: hidden; }
-    #photoBox img { width:100%; height:100%; object-fit:cover; }
-    
-    #logoContainer { position: absolute; left: 10px; top: 50px; width: 170px; height: 170px; z-index: 10; cursor: pointer; border: 1px dashed transparent; display: flex; align-items: center; justify-content: center; }
-    #logoContainer img { width: 100%; height: 100%; object-fit: contain; }
+        .container { max-width: 1000px; margin: auto; background: white; border-radius: 20px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
 
-    .row { display:flex; gap:15px; margin-bottom:12px; align-items: center; color: #1e5631; width: 100%; }
-    .row > div { display: flex; align-items: center; gap: 8px; white-space: nowrap; }
-    input { font-size:17px; font-weight:800; padding:4px 8px; border:1.5px solid #1e5631; border-radius:4px; background: #f9fff9; width: 100%; box-sizing: border-box; height: 32px; }
-    
-    table { width:100%; border-collapse:collapse; margin-top:10px; background:white; border: 2px solid #1e5631; }
-    th, td { border:1.5px solid #1e5631; padding:6px; text-align:center; font-size:17px; }
-    th { background: #FFFDD0 !important; color: #000 !important; }
+        h1 { text-align: center; color: #1e5631; margin-bottom: 10px; }
+        h2 { color: #1e5631; margin: 20px 0 10px 0; }
 
-    /* Kitab ke Name ki Styling */
-    .subject-name { font-style: italic !important; text-align: center !important; }
+        /* Login Form */
+        #loginSection { max-width: 400px; margin: 100px auto; text-align: center; }
+        #loginSection input { display: block; width: 100%; margin: 10px 0; padding: 15px; font-size: 16px; border: 2px solid #1e5631; border-radius: 10px; }
+        #loginSection button { width: 100%; padding: 15px; background: #1e5631; color: white; border: none; border-radius: 10px; font-size: 18px; font-weight: bold; cursor: pointer; }
+        .error { color: red; text-align: center; display: none; margin-top: 10px; }
 
-    /* Row colors */
-    tbody#markSheet tr:nth-child(1) { background-color: #fce4ec; }
-    tbody#markSheet tr:nth-child(2) { background-color: #e8f5e9; }
-    tbody#markSheet tr:nth-child(3) { background-color: #e3f2fd; }
-    tbody#markSheet tr:nth-child(4) { background-color: #fff3e0; }
-    tbody#markSheet tr:nth-child(5) { background-color: #f3e5f5; }
-    tbody#markSheet tr:nth-child(6) { background-color: #f1f8e9; }
-    tbody#markSheet tr:nth-child(7) { background-color: #e0f2f1; }
-    tbody#markSheet tr:nth-child(8) { background-color: #fffde7; }
-    tbody#markSheet tr:nth-child(9) { background-color: #efebe9; }
-    tbody#markSheet tr:nth-child(10) { background-color: #e1f5fe; }
+        /* Admin Panel - Hidden by default */
+        #adminPanel { display: none; }
 
-    #resultBox { margin:15px auto; width:70%; padding:10px; text-align:center; font-size:22px; font-weight:900; background: #fdfbf7; border:2px solid #1b5e20; border-radius:10px; display: flex; justify-content: center; gap: 40px; align-items: center; color: #1b5e20; }
-    .status-label { padding: 2px 20px; border-radius: 5px; border: 2px solid transparent; color: #000; opacity: 0.2; }
-    .status-active { border: 2px solid #1b5e20; opacity: 1; background: #fff; }
-    
-    .footer-sign { 
-        margin-top: auto; 
-        display: flex; 
-        justify-content: space-between; 
-        padding: 0 40px; 
-        padding-bottom: 30px; 
-        color: #1e5631; 
-    }
+        /* Tabs */
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; }
+        .tab { padding: 12px 24px; background: #ddd; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        .tab.active { background: #1e5631; color: white; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
 
-    .controls { text-align:center; margin:20px auto; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; background: #fff; padding: 15px; border-radius: 10px; width: 950px; border: 1px solid #ddd; }
-    .btn { padding: 10px 20px; font-size: 13px; font-weight: bold; border-radius: 5px; cursor: pointer; border: none; color: white; transition: 0.3s; }
-    
-    #savedListSection { width:950px; margin: 40px auto; background: white; padding: 20px; border-radius: 10px; border: 3px solid #1e5631; }
-    .list-controls { margin-bottom: 20px; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; border-bottom: 1px solid #ddd; padding-bottom: 15px; }
+        /* Form */
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
+        .form-grid input, .form-grid select, .form-grid textarea { width: 100%; padding: 12px; border: 2px solid #1e5631; border-radius: 8px; font-size: 14px; }
+        .full-width { grid-column: span 2; }
 
-    @media print {
-        body { background: white !important; padding: 0 !important; margin: 0 !important; }
-        .controls, #savedListSection, #photoUpload, #logoUploadInput, #urduUploadInput, #card { display: none !important; }
-        #printArea { display: block !important; width: 100%; }
-        #printArea img { width: 100%; height: auto; display: block; }
-        @page { size: A4; margin: 5mm; }
-    }
-    #printArea { display: none; }
-</style>
+        .btn-group { display: flex; gap: 10px; margin-top: 15px; }
+        .btn { padding: 12px 24px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; color: white; }
+        .btn-primary { background: #1e5631; }
+        .btn-success { background: #27ae60; }
+        .btn-danger { background: #e74c3c; }
+        .btn-secondary { background: #7f8c8d; }
+
+        /* Table */
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #1e5631; padding: 10px; text-align: center; }
+        th { background: #1e5631; color: white; }
+        tr:nth-child(even) { background: #f0f0f0; }
+
+        /* Marks Input Grid */
+        .marks-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 15px; }
+        .marks-grid input { width: 100%; padding: 10px; text-align: center; border: 2px solid #1e5631; border-radius: 8px; }
+
+        .logout-btn { float: right; background: #e74c3c; padding: 10px 20px; }
+
+        @media print { body { background: white; } .no-print { display: none; } }
+    </style>
 </head>
 <body>
 
-<div id="card">
-    <div id="topSpace">
-        <div class="reg-no" style="left: 22px;">Reg. No: <input id="regNo" value="G- 59313" style="border:none; background:transparent; width:100px;"></div>
-        <div class="reg-no urdu-label" style="right: 19px; direction: rtl;">رکنیت نمبر: <input id="udise" value="4053" style="border:none; background:transparent; width:100px; text-align:right; color: #1b5e20;"></div>
-        
-        <div id="logoContainer" onclick="document.getElementById('logoUploadInput').click()">
-            <img id="schoolLogo" src="" alt="">
-            <span id="logoText" style="font-size: 10px; position: absolute; color:#ccc;"> </span>
-        </div>
-        <input type="file" id="logoUploadInput" accept="image/*" style="display:none;">
+<div class="container">
+    <!-- Login Section -->
+    <div id="loginSection">
+        <h1>🏫 Madarsa Result Admin</h1>
+        <p style="color:#666; margin-bottom:20px;">Admin Login</p>
+        <input type="text" id="username" placeholder="Username (admin)">
+        <input type="password" id="password" placeholder="Password (admin123)">
+        <button onclick="login()">🔐 Login</button>
+        <p class="error" id="loginError">❌ Invalid username or password</p>
+    </div>
 
-        <div id="headerDraggable">
-            <div onclick="document.getElementById('urduUploadInput').click()">
-                <img id="urduLogoImg" src="" alt="Click to Upload Urdu Name JPG">
-                <input type="file" id="urduUploadInput" accept="image/*" style="display:none;">
+    <!-- Admin Panel -->
+    <div id="adminPanel">
+        <button class="btn logout-btn" onclick="logout()">🚪 Logout</button>
+        <h1>🏫 Madarsa Arabia Noorul Uloom</h1>
+        <p style="color:#666;">Admin Panel - Student Result Management</p>
+
+        <!-- Tabs -->
+        <div class="tabs no-print">
+            <button class="tab active" onclick="showTab('addStudent')">➕ Add Student</button>
+            <button class="tab" onclick="showTab('viewStudents')">👥 View All Students</button>
+            <button class="tab" onclick="showTab('exportData')">📤 Export Data</button>
+        </div>
+
+        <!-- Add Student Tab -->
+        <div id="addStudent" class="tab-content active">
+            <h2>➕ Add New Student</h2>
+            <div class="form-grid">
+                <input type="text" id="sname" placeholder="Student Name *" class="full-width">
+                <input type="text" id="fname" placeholder="Father Name *">
+                <input type="text" id="mname" placeholder="Mother Name">
+                <input type="text" id="roll" placeholder="Roll Number *" class="full-width">
+                <select id="sclass">
+                    <option value="">Select Class *</option>
+                    <option value="Nursery">Nursery</option>
+                    <option value="1st">Class 1st</option>
+                    <option value="2nd">Class 2nd</option>
+                    <option value="3rd">Class 3rd</option>
+                    <option value="4th">Class 4th</option>
+                    <option value="5th">Class 5th</option>
+                    <option value="6th">Class 6th</option>
+                    <option value="7th">Class 7th</option>
+                    <option value="8th">Class 8th</option>
+                    <option value="9th">Class 9th</option>
+                    <option value="10th">Class 10th</option>
+                </select>
+                <select id="syear">
+                    <option value="">Select Year</option>
+                    <option value="2025">2025</option>
+                    <option value="2024">2024</option>
+                    <option value="2023">2023</option>
+                </select>
+                <input type="text" id="sdob" placeholder="Date of Birth (DD-MM-YYYY)">
+                <input type="text" id="saddress" placeholder="Address" class="full-width">
+                
+                <div class="full-width">
+                    <h3 style="margin: 15px 0 10px 0;">📝 Enter Marks (Out of 100)</h3>
+                    <div class="marks-grid">
+                        <input type="number" id="m1" placeholder="Quran">
+                        <input type="number" id="m2" placeholder="Hifz">
+                        <input type="number" id="m3" placeholder="Deeniyat">
+                        <input type="number" id="m4" placeholder="Urdu">
+                        <input type="number" id="m5" placeholder="English">
+                        <input type="number" id="m6" placeholder="Hindi">
+                        <input type="number" id="m7" placeholder="Science">
+                        <input type="number" id="m8" placeholder="Social">
+                        <input type="number" id="m9" placeholder="Math">
+                        <input type="number" id="m10" placeholder="Dua">
+                    </div>
+                </div>
             </div>
-            <div style="font-size:32px; font-weight: 900; color:#0000FF; margin-top: -5px;">MADARSA ARABIA NOORUL ULOOM</div>
-            <div style="font-size:24px; font-weight: 800; color:#0000FF;">Karma Khan, Distt: Sant Kabir Nagar (U.P.)</div>
-            <div style="font-size:22px; margin-top:5px; background: #FFFDD0; color: #000; display: inline-block; padding: 2px 25px; border-radius: 18px; border: 1px solid #1e5631;">Annual Examination - 2025-26</div>
+
+            <div class="btn-group">
+                <button class="btn btn-success" onclick="saveStudent()">💾 Save Student</button>
+                <button class="btn btn-secondary" onclick="clearForm()">🆕 Clear Form</button>
+                <button class="btn btn-primary" onclick="loadAllStudents()">📋 View All</button>
+            </div>
         </div>
-        <div id="photoBox"><img id="photoPreview" style="display:none;"><span id="photoText" style="color:#2e7d32; font-size:12px;">Photo</span></div>
+
+        <!-- View Students Tab -->
+        <div id="viewStudents" class="tab-content">
+            <div style="display:flex; gap:10px; margin-bottom:15px;">
+                <input type="text" id="searchStudent" placeholder="Search by name or roll..." onkeyup="searchStudents()" style="flex:1; padding:12px; border:2px solid #1e5631; border-radius:8px;">
+                <select id="filterClass" onchange="filterByClass()" style="padding:12px; border:2px solid #1e5631; border-radius:8px;">
+                    <option value="">All Classes</option>
+                    <option value="Nursery">Nursery</option>
+                    <option value="1st">1st</option>
+                    <option value="2nd">2nd</option>
+                    <option value="3rd">3rd</option>
+                    <option value="4th">4th</option>
+                    <option value="5th">5th</option>
+                    <option value="6th">6th</option>
+                    <option value="7th">7th</option>
+                    <option value="8th">8th</option>
+                    <option value="9th">9th</option>
+                    <option value="10th">10th</option>
+                </select>
+            </div>
+            <table id="studentTable">
+                <thead>
+                    <tr><th>Roll</th><th>Name</th><th>Class</th><th>Year</th><th>Total</th><th>%</th><th>Rank</th><th>Action</th></tr>
+                </thead>
+                <tbody id="studentBody"></tbody>
+            </table>
+        </div>
+
+        <!-- Export Tab -->
+        <div id="exportData" class="tab-content">
+            <h2>📤 Export / Import Data</h2>
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="exportJSON()">📥 Download JSON</button>
+                <button class="btn btn-secondary" onclick="document.getElementById('importFile').click()">📤 Import JSON</button>
+                <input type="file" id="importFile" accept=".json" style="display:none;" onchange="importJSON(event)">
+                <button class="btn btn-success" onclick="exportExcel()">📊 Export Excel</button>
+            </div>
+            <div style="margin-top:20px;">
+                <button class="btn btn-danger" onclick="clearAllData()">🗑️ Delete All Data (Warning!)</button>
+            </div>
+            <div style="margin-top:30px; padding:20px; background:#f0f0f0; border-radius:10px;">
+                <h3>📊 Statistics</h3>
+                <p>Total Students: <strong id="totalStudents">0</strong></p>
+                <p>Pass: <strong id="totalPass">0</strong></p>
+                <p>Fail: <strong id="totalFail">0</strong></p>
+            </div>
+        </div>
     </div>
-    
-    <input type="file" id="photoUpload" accept="image/*" data-html2canvas-ignore="true" style="position: absolute; right: 25px; top: 220px; font-size:10px; width:130px;">
-
-    <div class="row">
-        <div style="flex: 1.5;"><span>Student Name:</span> <input id="sname"></div>
-        <div style="flex: 1.5;"><span>Father Name:</span> <input id="fname"></div>
-    </div>
-    <div class="row">
-        <div style="flex: 1.5;"><span>Mother Name:</span> <input id="mname"></div>
-        <div style="width: 180px;"><span>D.O.B:</span> <input id="dob"></div>
-        <div style="width: 100px;"><span>Class:</span> <input id="sclass"></div>
-        <div style="width: 130px;"><span>Roll No:</span> <input id="rollno"></div>
-    </div>
-    <div class="row"><div style="flex: 1;"><span>Address:</span> <input id="address"></div></div>
-
-    <table>
-        <thead>
-            <tr>
-                <th style="width: 60px;">Sr No.</th>
-                <th>Subject</th>
-                <th>Max</th>
-                <th>Marks Obtained</th>
-            </tr>
-        </thead>
-        <tbody id="markSheet"></tbody>
-        <tfoot>
-            <tr style="background:#f9fff9">
-                <th colspan="2" style="font-style: italic; text-align: center;">Total</th>
-                <th>1000</th>
-                <th id="total">0</th>
-            </tr>
-            <tr style="background:#f9fff9">
-                <th colspan="2" style="font-style: italic; text-align: center;">Percentage</th>
-                <th colspan="2" id="percent">0%</th>
-            </tr>
-            <tr class="cream-bg">
-                <th colspan="2" style="font-style: italic; text-align: center;">Rank</th>
-                <th colspan="2" id="rank" style="font-size:18px;">-</th>
-            </tr>
-            <tr class="cream-bg">
-                <th colspan="2" style="font-style: italic; text-align: center;">Division</th>
-                <th colspan="2"><input id="division" style="width: 90%; border: none; background: transparent; text-align: center; font-size: 18px; font-weight: 800; font-style: italic;"></th>
-            </tr>
-        </tfoot>
-    </table>
-
-    <div id="resultBox">
-        <span>RESULT:</span>
-        <span id="passLabel" class="status-label">PASS ✓</span>
-        <span id="failLabel" class="status-label">FAIL ✗</span>
-    </div>
-
-    <div class="footer-sign">
-        <div>Principal Signature: _____________________________</div>
-        <div>Stamp:____________________________________</div>
-    </div>
-</div>
-
-<div id="printArea"></div>
-
-<div class="controls">
-    <button class="btn" onclick="saveAndRank()" style="background: #27ae60;">💾 SAVE RECORD</button>
-    <button class="btn" onclick="laptopPrint()" style="background: #2980b9;">🖨️ PRINT (A4)</button>
-    <button class="btn" onclick="clearAll()" style="background: #7f8c8d;">🆕 NEW FORM</button>
-</div>
-
-<div id="savedListSection">
-    <h2 style="color: #1e5631; text-align: center;">Saved Records (Bachon ki List)</h2>
-    <div class="list-controls">
-        <input type="file" id="jsonImport" accept=".json" style="display:none;" onchange="importJSONBackup(event)">
-        <button class="btn" onclick="document.getElementById('jsonImport').click()" style="background: #e67e22;">📥 IMPORT BACKUP</button>
-        <button class="btn" onclick="exportJSONBackup()" style="background: #34495e;">📤 DOWNLOAD BACKUP</button>
-        <button class="btn" onclick="exportToExcel()" style="background: #1d6f42;">📊 EXPORT TO EXCEL</button>
-        <button class="btn" onclick="printSelected()" style="background: #8e44ad;">🖨️ SELECT PRINT</button>
-    </div>
-    <table id="recordsTable" style="width:100%">
-        <thead><tr class="cream-bg"><th><input type="checkbox" id="selectAll" onclick="toggleSelectAll(this)"></th><th>Roll No</th><th>Name</th><th>Total</th><th>Rank</th><th>Action</th></tr></thead>
-        <tbody id="recordsBody"></tbody>
-    </table>
 </div>
 
 <script>
-let subjects=["Quran","Hifz","Deeniyat","Urdu","English","Hindi","Science","Social Science","Math","Dua & Kalma"];
-let markSheet = document.getElementById("markSheet");
-let currentPhotoBase64 = "";
+// Login Credentials
+const ADMIN_USER = "admin";
+const ADMIN_PASS = "admin123";
 
-// Generate Rows with Sr No.
-subjects.forEach((s,i)=>{
-    markSheet.innerHTML += `
-        <tr>
-            <td>${i+1}</td>
-            <td class="subject-name">${s}</td>
-            <td>100</td>
-            <td><input class="mark" id="m${i}" oninput="calculate()" style="width:70px; text-align:center; border:none; font-weight:800; background:transparent;"></td>
-        </tr>`;
-});
+// Data Storage Key
+const DATA_KEY = "madarsa_students";
 
-function calculate(){
-    let t=0;
-    for(let i=0; i<subjects.length; i++){ t += parseInt(document.getElementById("m"+i).value) || 0; }
-    document.getElementById("total").innerText = t;
-    document.getElementById("percent").innerText = (t / subjects.length).toFixed(2) + "%";
-    let pass = t >= 330;
-    document.getElementById("passLabel").className = pass ? "status-label status-active" : "status-label";
-    document.getElementById("failLabel").className = !pass ? "status-label status-active" : "status-label";
-    autoRankUpdate(t);
+function login() {
+    let user = document.getElementById('username').value;
+    let pass = document.getElementById('password').value;
+    
+    if(user === ADMIN_USER && pass === ADMIN_PASS) {
+        document.getElementById('loginSection').style.display = 'none';
+        document.getElementById('adminPanel').style.display = 'block';
+        loadAllStudents();
+    } else {
+        document.getElementById('loginError').style.display = 'block';
+    }
 }
 
-function autoRankUpdate(currentTotal) {
-    if(currentTotal === 0) { document.getElementById("rank").innerText = "-"; return; }
-    let students = JSON.parse(localStorage.getItem("madarsa_records") || "[]");
-    let totals = students.map(s => parseInt(s.total));
-    if (!totals.includes(currentTotal)) totals.push(currentTotal);
-    totals.sort((a, b) => b - a);
-    let uniqueTotals = [...new Set(totals)];
-    document.getElementById("rank").innerText = uniqueTotals.indexOf(currentTotal) + 1;
+function logout() {
+    document.getElementById('loginSection').style.display = 'block';
+    document.getElementById('adminPanel').style.display = 'none';
+    document.getElementById('username').value = '';
+    document.getElementById('password').value = '';
 }
 
-async function laptopPrint() {
-    const card = document.getElementById("card");
-    const printArea = document.getElementById("printArea");
-    card.querySelectorAll('input').forEach(inp => inp.setAttribute('value', inp.value));
-    try {
-        const canvas = await html2canvas(card, { scale: 2, useCORS: true });
-        const imgData = canvas.toDataURL('image/png');
-        printArea.innerHTML = `<img src="${imgData}">`;
-        setTimeout(() => { window.print(); }, 500);
-    } catch(e) { alert("Error: Image loading issue!"); }
+function showTab(tabId) {
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.getElementById(tabId).classList.add('active');
+    event.target.classList.add('active');
 }
 
-function saveAndRank(){
-    let roll = document.getElementById("rollno").value;
-    let name = document.getElementById("sname").value;
-    if(!roll || !name) return alert("Roll No aur Name bharen!");
-    let data = {
-        roll, name, total: document.getElementById("total").innerText,
-        fname: document.getElementById("fname").value, mname: document.getElementById("mname").value,
-        dob: document.getElementById("dob").value, sclass: document.getElementById("sclass").value,
-        address: document.getElementById("address").value, regNo: document.getElementById("regNo").value,
-        udise: document.getElementById("udise").value, division: document.getElementById("division").value,
-        marks: subjects.map((_, i) => document.getElementById("m"+i).value), photo: currentPhotoBase64
+function getGrade(marks) {
+    if(marks >= 90) return "A+";
+    if(marks >= 80) return "A";
+    if(marks >= 70) return "B+";
+    if(marks >= 60) return "B";
+    if(marks >= 50) return "C";
+    return "Fail";
+}
+
+function getDivision(percent) {
+    if(percent >= 60) return "First";
+    if(percent >= 50) return "Second";
+    if(percent >= 33) return "Third";
+    return "Fail";
+}
+
+function saveStudent() {
+    let name = document.getElementById('sname').value;
+    let roll = document.getElementById('roll').value;
+    let studentClass = document.getElementById('sclass').value;
+    let year = document.getElementById('syear').value;
+    
+    if(!name || !roll || !studentClass || !year) {
+        alert("Please fill all required fields (* marked)!");
+        return;
+    }
+    
+    // Get marks
+    let marks = {
+        quran: parseInt(document.getElementById('m1').value) || 0,
+        hifz: parseInt(document.getElementById('m2').value) || 0,
+        deeniyat: parseInt(document.getElementById('m3').value) || 0,
+        urdu: parseInt(document.getElementById('m4').value) || 0,
+        english: parseInt(document.getElementById('m5').value) || 0,
+        hindi: parseInt(document.getElementById('m6').value) || 0,
+        science: parseInt(document.getElementById('m7').value) || 0,
+        social: parseInt(document.getElementById('m8').value) || 0,
+        math: parseInt(document.getElementById('m9').value) || 0,
+        dua: parseInt(document.getElementById('m10').value) || 0
     };
-    let students = JSON.parse(localStorage.getItem("madarsa_records") || "[]");
-    students = students.filter(s => s.roll.toString() !== roll.toString());
-    students.push(data);
-    localStorage.setItem("madarsa_records", JSON.stringify(students));
-    updateRecordsTable();
-    alert("Record Saved!");
+    
+    let total = Object.values(marks).reduce((a, b) => a + b, 0);
+    let percent = (total / 10);
+    let pass = total >= 330;
+    
+    let student = {
+        roll: roll,
+        name: name,
+        fname: document.getElementById('fname').value,
+        mname: document.getElementById('mname').value,
+        class: studentClass,
+        year: year,
+        dob: document.getElementById('sdob').value,
+        address: document.getElementById('saddress').value,
+        total: total,
+        percent: percent.toFixed(1) + "%",
+        pass: pass,
+        division: getDivision(percent),
+        marks: marks
+    };
+    
+    // Get existing data
+    let students = JSON.parse(localStorage.getItem(DATA_KEY) || "[]");
+    
+    // Check if roll exists
+    let existingIndex = students.findIndex(s => s.roll === roll && s.class === studentClass && s.year === year);
+    if(existingIndex >= 0) {
+        if(!confirm("Roll number already exists! Overwrite?")) return;
+        students[existingIndex] = student;
+    } else {
+        students.push(student);
+    }
+    
+    localStorage.setItem(DATA_KEY, JSON.stringify(students));
+    alert("Student saved successfully!");
+    clearForm();
+    loadAllStudents();
 }
 
-function updateRecordsTable() {
-    let students = JSON.parse(localStorage.getItem("madarsa_records") || "[]");
+function loadAllStudents() {
+    let students = JSON.parse(localStorage.getItem(DATA_KEY) || "[]");
+    
+    // Sort by total
     students.sort((a, b) => b.total - a.total);
-    document.getElementById("recordsBody").innerHTML = students.map((s, index) => `<tr><td><input type="checkbox" class="student-checkbox" value="${s.roll}"></td><td>${s.roll}</td><td>${s.name}</td><td>${s.total}</td><td>${index + 1}</td><td><button onclick="editRecord('${s.roll}')">Edit</button><button onclick="deleteRecord('${s.roll}')">Del</button></td></tr>`).join('');
-}
-
-document.getElementById("logoUploadInput").onchange = function(e){
-    let reader = new FileReader();
-    reader.onload = (ev) => { document.getElementById("schoolLogo").src = ev.target.result; localStorage.setItem("m_logo", ev.target.result); };
-    reader.readAsDataURL(e.target.files[0]);
-};
-
-document.getElementById("urduUploadInput").onchange = function(e){
-    let reader = new FileReader();
-    reader.onload = (ev) => { document.getElementById("urduLogoImg").src = ev.target.result; localStorage.setItem("m_urdu_logo", ev.target.result); };
-    reader.readAsDataURL(e.target.files[0]);
-};
-
-document.getElementById("photoUpload").onchange = function(e){
-    let reader = new FileReader();
-    reader.onload = (ev) => {
-        currentPhotoBase64 = ev.target.result;
-        document.getElementById("photoPreview").src = ev.target.result;
-        document.getElementById("photoPreview").style.display="block";
-        document.getElementById("photoText").style.display="none";
-    };
-    reader.readAsDataURL(e.target.files[0]);
-};
-
-function editRecord(roll) {
-    let students = JSON.parse(localStorage.getItem("madarsa_records") || "[]");
-    let s = students.find(i => i.roll.toString() === roll.toString());
-    if(!s) return;
-    document.getElementById("rollno").value = s.roll;
-    document.getElementById("sname").value = s.name;
-    document.getElementById("fname").value = s.fname;
-    document.getElementById("mname").value = s.mname;
-    document.getElementById("dob").value = s.dob;
-    document.getElementById("sclass").value = s.sclass;
-    document.getElementById("address").value = s.address;
-    document.getElementById("division").value = s.division;
-    s.marks.forEach((v, i) => { if(document.getElementById("m"+i)) document.getElementById("m"+i).value = v; });
-    if(s.photo) {
-        currentPhotoBase64 = s.photo;
-        document.getElementById("photoPreview").src = s.photo;
-        document.getElementById("photoPreview").style.display="block";
-        document.getElementById("photoText").style.display="none";
-    }
-    calculate();
-}
-
-async function printSelected() {
-    const printArea = document.getElementById("printArea");
-    printArea.innerHTML = "";
-    const selected = document.querySelectorAll('.student-checkbox:checked');
-    if (selected.length === 0) return alert("Select Students first!");
-    for (let cb of selected) {
-        editRecord(cb.value);
-        await new Promise(r => setTimeout(r, 600));
-        document.getElementById("card").querySelectorAll('input').forEach(inp => inp.setAttribute('value', inp.value));
-        const canvas = await html2canvas(document.getElementById("card"), { scale: 2 });
-        const img = document.createElement("img");
-        img.src = canvas.toDataURL('image/png');
-        img.style.pageBreakAfter = "always";
-        printArea.appendChild(img);
-    }
-    window.print();
-}
-
-function exportToExcel() {
-    let students = JSON.parse(localStorage.getItem("madarsa_records") || "[]");
-    if(students.length === 0) return alert("No data to export!");
-    const ws = XLSX.utils.json_to_sheet(students);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Results");
-    XLSX.writeFile(wb, "Madarsa_Results.xlsx");
-}
-
-function exportJSONBackup() {
-    let data = localStorage.getItem("madarsa_records");
-    if(!data) return alert("No data to backup!");
-    let blob = new Blob([data], {type: "application/json"});
-    let a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = "Madarsa_Backup.json";
-    a.click();
-}
-
-function importJSONBackup(event) {
-    let reader = new FileReader();
-    reader.onload = (e) => { 
-        localStorage.setItem("madarsa_records", e.target.result); 
-        updateRecordsTable(); 
-        alert("Imported Successfully!"); 
-    };
-    reader.readAsText(event.target.files[0]);
-}
-
-window.onload = () => {
-    let logo = localStorage.getItem("m_logo");
-    if(logo) { document.getElementById("schoolLogo").src = logo; }
-    let urduLogo = localStorage.getItem("m_urdu_logo");
-    if(urduLogo) { document.getElementById("urduLogoImg").src = urduLogo; }
-    updateRecordsTable();
-};
-
-function toggleSelectAll(src) { document.querySelectorAll('.student-checkbox').forEach(c => c.checked = src.checked); }
-function clearAll(){ if(confirm("Refresh Page?")) location.reload(); }
-function deleteRecord(roll) { if(confirm("Delete?")) { let s = JSON.parse(localStorage.getItem("madarsa_records") || "[]"); localStorage.setItem("madarsa_records", JSON.stringify(s.filter(i => i.roll.toString() !== roll.toString()))); updateRecordsTable(); } }
-</script>
-</body>
-</html>
+    
+    // Calculate ranks
+    students.forEach((s, i) => s.rank = i + 1);
+    
+    let tbody = document.getElementById('studentBody');
+    tbody.innerHTML = "";
+    
+    students.forEach(s => {
+        tbody.innerHTML += `
+            <tr>
+                <td>${s.roll}</td>
+                <td>${s.name}</td>
+                <td>${s.class}</td>
+                <td>${s.year}</td>
+                <td>
