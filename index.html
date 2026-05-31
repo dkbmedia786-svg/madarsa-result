@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Madarsa Arabia Noorul Uloom - Result Portal</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; }
+        
+        body {
+            background: linear-gradient(135deg, #1e5631, #a4be7b);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        h1 {
+            text-align: center;
+            color: #1e5631;
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 25px;
+            font-size: 14px;
+        }
+
+        .search-box {
+            background: #f5f5f5;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        .input-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border: 2px solid #1e5631;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            background: #1e5631;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button:hover { background: #2e7d32; }
+
+        .error {
+            color: red;
+            text-align: center;
+            margin-top: 15px;
+            display: none;
+        }
+
+        /* Result Card */
+        #result {
+            display: none;
+            margin-top: 30px;
+        }
+
+        .result-header {
+            background: #1e5631;
+            color: white;
+            padding: 20px;
+            border-radius: 15px 15px 0 0;
+            text-align: center;
+        }
+
+        .result-body {
+            border: 3px solid #1e5631;
+            border-top: none;
+            border-radius: 0 0 15px 15px;
+            padding: 20px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            background: #f9f9f9;
+            border-radius: 8px;
+        }
+
+        .label { color: #666; font-weight: bold; }
+        .value { color: #1e5631; font-weight: bold; }
+
+        .marks-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .marks-table th, .marks-table td {
+            border: 1px solid #1e5631;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .marks-table th {
+            background: #FFFDD0;
+        }
+
+        .total-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .total-box {
+            background: linear-gradient(135deg, #1e5631, #2e7d32);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        .total-label { font-size: 14px; }
+        .total-value { font-size: 28px; font-weight: bold; }
+
+        .rank-box {
+            background: #ff9800;
+            color: white;
+        }
+
+        .status {
+            text-align: center;
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .pass { background: #c8e6c9; color: #2e7d32; }
+        .fail { background: #ffcdd2; color: #c62828; }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #999;
+            font-size: 12px;
+        }
+
+        @media print {
+            body { background: white; }
+            .search-box, .footer { display: none; }
+            #result { display: block; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🏫 Madarsa Arabia Noorul Uloom</h1>
+    <p class="subtitle">Karma Khan, Distt: Sant Kabir Nagar (U.P.)<br>Annual Examination - 2025-26</p>
+
+    <div class="search-box">
+        <h2 style="color:#1e5631; margin-bottom:20px;">🎓 Check Your Result</h2>
+        
+        <div class="input-group">
+            <select id="classSelect">
+                <option value="">Select Class</option>
+                <option value="Nursery">Nursery</option>
+                <option value="1st">Class 1st</option>
+                <option value="2nd">Class 2nd</option>
+                <option value="3rd">Class 3rd</option>
+                <option value="4th">Class 4th</option>
+                <option value="5th">Class 5th</option>
+                <option value="6th">Class 6th</option>
+                <option value="7th">Class 7th</option>
+                <option value="8th">Class 8th</option>
+                <option value="9th">Class 9th</option>
+                <option value="10th">Class 10th</option>
+            </select>
+            
+            <select id="yearSelect">
+                <option value="">Select Year</option>
+                <option value="2025">2025</option>
+                <option value="2024">2024</option>
+                <option value="2023">2023</option>
+            </select>
+            
+            <input type="number" id="rollInput" placeholder="Enter Roll Number">
+        </div>
+        
+        <button onclick="searchResult()">🔍 Search Result</button>
+        
+        <p class="error" id="errorMsg">❌ Roll number nahi mila! Please check aur try karein.</p>
+    </div>
+
+    <!-- Result Display -->
+    <div id="result">
+        <div class="result-header">
+            <h2>🎉 Annual Examination Result</h2>
+        </div>
+        
+        <div class="result-body">
+            <div class="info-grid">
+                <div class="info-row">
+                    <span class="label">Student Name:</span>
+                    <span class="value" id="resName"></span>
+                </div>
+                <div class="info-row">
+                    <span class="label">Father Name:</span>
+                    <span class="value" id="resFName"></span>
+                </div>
+                <div class="info-row">
+                    <span class="label">Mother Name:</span>
+                    <span class="value" id="resMName"></span>
+                </div>
+                <div class="info-row">
+                    <span class="label">Roll Number:</span>
+                    <span class="value" id="resRoll"></span>
+                </div>
+                <div class="info-row">
+                    <span class="label">Class:</span>
+                    <span class="value" id="resClass"></span>
+                </div>
+                <div class="info-row">
+                    <span class="label">Year:</span>
+                    <span class="value" id="resYear"></span>
+                </div>
+                <div class="info-row">
+                    <span class="label">Date of Birth:</span>
+                    <span class="value" id="resDOB"></span>
+                </div>
+                <div class="info-row">
+                    <span class="label">Address:</span>
+                    <span class="value" id="resAddress"></span>
+                </div>
+            </div>
+
+            <table class="marks-table">
+                <thead>
+                    <tr>
+                        <th>S.No</th>
+                        <th>Subject</th>
+                        <th>Marks (100)</th>
+                        <th>Grade</th>
+                    </tr>
+                </thead>
+                <tbody id="marksBody">
+                </tbody>
+            </table>
+
+            <div class="total-section">
+                <div class="total-box">
+                    <div class="total-label">Total Marks</div>
+                    <div class="total-value" id="resTotal"></div>
+                </div>
+                <div class="total-box">
+                    <div class="total-label">Percentage</div>
+                    <div class="total-value" id="resPercent"></div>
+                </div>
+                <div class="total-box rank-box">
+                    <div class="total-label">Rank</div>
+                    <div class="total-value" id="resRank"></div>
+                </div>
+            </div>
+
+            <div class="status" id="resStatus">
+                ✅ PASSED
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>Powered by Madarsa Arabia Noorul Uloom | Karma Khan</p>
+    </div>
+</div>
+
+<!-- Data File Include Karein -->
+<script src="data.js"></script>
+
+<script>
+function getGrade(marks) {
+    if(marks >= 90) return "A+";
+    if(marks >= 80) return "A";
+    if(marks >= 70) return "B+";
+    if(marks >= 60) return "B";
+    if(marks >= 50) return "C";
+    return "Fail";
+}
+
+function searchResult() {
+    let roll = document.getElementById('rollInput').value;
+    let studentClass = document.getElementById('classSelect').value;
+    let year = document.getElementById('yearSelect').value;
+    
+    // Check if all fields filled
+    if(!roll || !studentClass || !year) {
+        alert("Please Class, Year aur Roll Number sabhi fields fill karein!");
+        return;
+    }
+    
+    // Search student
+    let student = studentData.find(s => 
+        s.roll === roll && 
+        s.class === studentClass && 
+        s.year === year
+    );
+    
+    if(student) {
+        // Hide error, show result
+        document.getElementById('errorMsg').style.display = "none";
+        document.getElementById('result').style.display = "block";
+        
+        // Fill basic info
+        document.getElementById('resName').innerText = student.name;
+        document.getElementById('resFName').innerText = student.fname;
+        document.getElementById('resMName').innerText = student.mname;
+        document.getElementById('resRoll').innerText = student.roll;
+        document.getElementById('resClass').innerText = student.class;
+        document.getElementById('resYear').innerText = student.year;
+        document.getElementById('resDOB').innerText = student.dob;
+        document.getElementById('resAddress').innerText = student.address;
+        
+        // Fill marks table
+        let tbody = document.getElementById('marksBody');
+        tbody.innerHTML = "";
+        
+        const subjects = [
+            {key: 'quran', name: 'Quran'},
+            {key: 'hifz', name: 'Hifz'},
+            {key: 'deeniyat', name: 'Deeniyat'},
+            {key: 'urdu', name: 'Urdu'},
+            {key: 'english', name: 'English'},
+            {key: 'hindi', name: 'Hindi'},
+            {key: 'science', name: 'Science'},
+            {key: 'social', name: 'Social Science'},
+            {key: 'math', name: 'Math'},
+            {key: 'dua', name: 'Dua & Kalma'}
+        ];
+        
+        subjects.forEach((sub, index) => {
+            let marks = student.marks[sub.key] || 0;
+            let grade = getGrade(marks);
+            tbody.innerHTML += `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td>${sub.name}</td>
+                    <td>${marks}</td>
+                    <td>${grade}</td>
+                </tr>
+            `;
+        });
+        
+        // Fill totals
+        document.getElementById('resTotal').innerText = student.total + "/1000";
+        document.getElementById('resPercent').innerText = student.percent;
+        document.getElementById('resRank').innerText = "#" + student.rank;
+        
+        // Status
+        let status = document.getElementById('resStatus');
+        if(student.pass) {
+            status.innerHTML = "✅ PASSED - Division: " + student.division;
+            status.className = "status pass";
+        } else {
+            status.innerHTML = "❌ FAILED";
+            status.className = "status fail";
+        }
+    } else {
+        // Show error
+        document.getElementById('errorMsg').style.display = "block";
+        document.getElementById('result').style.display = "none";
+    }
+}
+</script>
+
+</body>
+</html>
