@@ -1,12 +1,13 @@
 [
   {
-    "roll": "187",
+    roll: "187",
     "name": "SANA PARVEEN",
     "total": "916",
     "fname": "TAHIR ALI",
     "mname": "AFSARI KHATOON",
     "dob": "29-05-2013",
-    "sclass": "5th",
+    class: "5th",
+    year: "2025",
     "address": "VILLAGE & POST KARMA KHAN, DISTRICT SANT KABIR NAGAR,UTTAR PRADESH, PINCODE- 272002",
     "regNo": "G- 59313",
     "udise": "4053",
